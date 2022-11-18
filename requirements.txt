@@ -12,3 +12,5 @@ seaborn==0.11.2
 streamlit==1.0.0
 imutils==0.5.4
 tensorflow==2.9.2
+pickle5
+scikit-learn

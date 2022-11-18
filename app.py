@@ -5,6 +5,11 @@ import pandas as pd
 import numpy as np
 import PIL
 from PIL import Image,ImageEnhance
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 hide_streamlit_style = """
             <style>
             footer {visibility: hidden;}
@@ -13,6 +18,33 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 uploaded_video = st.file_uploader("Choose video", type=["mp4", "mov"])
 frame_skip = 300 # display every 300 frames
+
+df = pd.read_csv("Book2.csv")
+
+y = df['Danger'].values.reshape(-1, 1)
+X = df['Temperature'].values.reshape(-1, 1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+SEED = 42
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = SEED)
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+def calc(slope, intercept, Area):
+    return slope*Area+intercept
+
+score = calc(regressor.coef_, regressor.intercept_, 9.5)
+
+score = regressor.predict([[9.5]])
+
+y_pred = regressor.predict(X_test)
+
+mae = mean_absolute_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+print(f'Mean absolute error: {mae:.2f}')
+print(f'Mean squared error: {mse:.2f}')
+print(f'Root mean squared error: {rmse:.2f}')
+st.dataframe(y_pred)
+
 
 if uploaded_video is not None: # run only when user uploads video
     vid = uploaded_video.name
@@ -53,3 +85,4 @@ if uploaded_video is not None: # run only when user uploads video
             st.image(inferno_palette)
             st.image(jet_palette)
             st.image(viridis_palette)
+  
